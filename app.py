@@ -1,13 +1,7 @@
-from flask import Flask, request, render_template
+import streamlit as st
 import requests
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-app = Flask(__name__)
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
+# Function to fetch all files from the repository
 def fetch_all_files(url, base_path, token=None):
     headers = {"Authorization": f"token {token}"} if token else {}
     response = requests.get(url, headers=headers)
@@ -81,20 +75,35 @@ def generate_prompt(file_paths):
         prompt += f"/{file_path}:\n{content}\n\n"
     return prompt
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        repo_url = request.form["repo_url"]
-        parts = repo_url.strip("/").split("/")
+def main():
+    # Sidebar - Settings section
+    st.sidebar.title('Settings')
+    api_key = st.sidebar.text_input('Enter your GitHub API Key', type='password')
+
+    # Main page
+    st.title('GitHub Repo to LLM Prompt')
+
+    repo_url = st.text_input('Enter GitHub Repository URL:', '')
+
+    if st.button('Generate Prompt'):
+        if not repo_url:
+            st.error('Please enter a GitHub repository URL.')
+            return
+
+        parts = repo_url.strip('/').split('/')
+        if len(parts) < 2:
+            st.error('Invalid repository URL format.')
+            return
+
         owner, repo = parts[-2], parts[-1]
         url = f"https://api.github.com/repos/{owner}/{repo}/contents"
+
         try:
-            file_paths = fetch_all_files(url, "", GITHUB_TOKEN)
+            file_paths = fetch_all_files(url, "", api_key)
             prompt = generate_prompt(file_paths)
-            return render_template("index.html", prompt=prompt)
+            st.code(prompt, language='text')
         except Exception as e:
-            return render_template("index.html", error=str(e))
-    return render_template("index.html")
+            st.error(f'An error occurred: {e}')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
