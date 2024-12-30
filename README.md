@@ -4,6 +4,8 @@
 
 A Streamlit web application that fetches the contents of a GitHub repository and generates a structured prompt for large language models (LLMs).
 
+- View it live [here](https://gh-repo-to-prompt.streamlit.app/)
+
 ## Features
 
 - Fetches repository contents using GitHub API.
