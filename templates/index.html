@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GitHub Repo to Prompt</title>
+</head>
+<body>
+    <h1>GitHub Repo to LLM Prompt</h1>
+    <form method="POST">
+        <label for="repo_url">GitHub Repository URL:</label>
+        <input type="text" id="repo_url" name="repo_url" required>
+        <button type="submit">Generate Prompt</button>
+    </form>
+    {% if error %}
+        <p style="color: red;">Error: {{ error }}</p>
+    {% endif %}
+    {% if prompt %}
+        <h2>Generated Prompt:</h2>
+        <pre>{{ prompt }}</pre>
+    {% endif %}
+</body>
+</html>
